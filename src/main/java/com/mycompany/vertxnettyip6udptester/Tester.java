@@ -137,7 +137,7 @@ public class Tester {
             payload.put("responsePort", uniSocket.localAddress().port());
 
             // Add the data
-            Buffer buffer = Buffer.buffer(payload.encode());
+            Buffer buffer = payload.toBuffer();
 
             // Send every 5 seconds - Just for fun
             LOG.info("Starting to send Discovery Requests every 5 seconds");
