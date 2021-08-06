@@ -16,6 +16,8 @@ read the port it needs to send a UDP response back to.
 No matter if I use Wireless or Hardwired on MacOS I can't get the code to 
 run successfully like it does on the other systems.
 
+**Note**: I disabled the Netty logging in `logback.xml` you can turn it on by modifying the file and rebuilding the project. I wanted clean outputs for the bug report.
+
 ## Code Setup
 
 The code has some initial defaults that I setup, defaults are in `()'s`:
