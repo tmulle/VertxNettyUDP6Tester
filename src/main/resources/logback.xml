@@ -5,7 +5,8 @@
         </encoder>
     </appender>
 
-    <logger name="io.netty" level="debug"/>
+    <!-- Turn this to DEBUG to see the Netty logging -->
+    <logger name="io.netty" level="ERROR"/>
 
     <root level="info">
         <appender-ref ref="STDOUT" />
