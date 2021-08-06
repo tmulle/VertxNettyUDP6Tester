@@ -80,7 +80,7 @@ public class Tester {
         LOG.info("*** Starting Variables ***");
         LOG.info("Network Mode = {}", MODE);
         LOG.info("Network Interface = {}", INTERFACE);
-        LOG.info("Netork Listen All Interface = {}", LISTEN_ALL_INTERFACE);
+        LOG.info("Network Listen All Interface = {}", LISTEN_ALL_INTERFACE);
         LOG.info("Network Multicast Group = {}", MULTICAST_GROUP);
         LOG.info("Network Port = {}", LISTEN_PORT);
         LOG.info("**************************");
