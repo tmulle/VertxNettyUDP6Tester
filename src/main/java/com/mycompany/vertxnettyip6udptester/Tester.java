@@ -45,10 +45,15 @@ public class Tester {
     private static String LISTEN_ALL_INTERFACE;
     private static int LISTEN_PORT;
     private static IP_MODE MODE;
+    private static Operation_Mode OP_MODE;
 
     // Which mode
     private static enum IP_MODE {
         IPv4, IPv6
+    };
+
+    private static enum Operation_Mode {
+        Sender, Device, Both
     };
 
     /**
@@ -77,7 +82,11 @@ public class Tester {
             }
         }
 
+        // Which service are we running? Default ALL
+        OP_MODE = Operation_Mode.valueOf(System.getProperty("service_mode", "Both"));
+
         LOG.info("*** Starting Variables ***");
+        LOG.info("Operation Mode = {}", OP_MODE);
         LOG.info("Network Mode = {}", MODE);
         LOG.info("Network Interface = {}", INTERFACE);
         LOG.info("Network Listen All Interface = {}", LISTEN_ALL_INTERFACE);
@@ -87,15 +96,37 @@ public class Tester {
 
         Vertx vertx = Vertx.vertx();
 
-        // Deploy the receive then the sender
-        Future<String> deviceVerticle = vertx.deployVerticle(new Device());
-        Future<String> senderVerticle = vertx.deployVerticle(new Sender());
+        switch (OP_MODE) {
+            case Sender: {
+                vertx.deployVerticle(new Sender()).
+                        onFailure(error -> {
+                            LOG.error("SENDER => Failed to startup", error);
+                            System.exit(-1);
+                        });
+            }
+            break;
 
-        CompositeFuture.all(deviceVerticle, senderVerticle)
-                .onFailure(error -> {
-                    LOG.error("Failed to startup", error);
-                    System.exit(-1);
-                });
+            case Device: {
+                vertx.deployVerticle(new Device())
+                        .onFailure(error -> {
+                            LOG.error("DEVICE => Failed to startup", error);
+                            System.exit(-1);
+                        });
+                break;
+            }
+            default: {
+                // Deploy the receive then the sender
+                Future<String> senderVerticle = vertx.deployVerticle(new Sender());
+                Future<String> deviceVerticle = vertx.deployVerticle(new Device());
+
+                CompositeFuture.all(deviceVerticle, senderVerticle)
+                        .onFailure(error -> {
+                            LOG.error("Failed to startup", error);
+                            System.exit(-1);
+                        });
+            }
+
+        }
 
     }
 

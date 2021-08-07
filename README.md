@@ -22,18 +22,27 @@ run successfully like it does on the other systems.
 
 The code has some initial defaults that I setup, defaults are in `()'s`:
 
+* OP_MODE - Which service are we running (Device, Sender, or Both) `(Both)`
 * MODE - Which mode are we in `IPv4` or `IPv6` (`IPv6`)
 * INTERFACE - Which interface to use ie. eth0, en0, etc. (`en0`)
 * LISTEN_PORT - Which port to listen on (`35056`)
 * MULTICAST_GROUP - The IPv4 or IPv6 Multicast Group (`FF02::1`)
 * LISTEN_ALL_INTERFACES - Listen address for all interfaces (`::`)
 
-You can override three options via the following env variables:
+You can override the options via the following env variables:
 * net.ip_mode - must be "IPv4" or "IPv6"..defaults to `IPv6`
 * net.interface - defaults to `en0`
 * net.listen_port - defaults to `35056`
+* net.service_mode - must be "Sender" or "Device" or "Both"..defaults to `Both` 
 
 You'll most likely want to override the `net.interface` to match your system.
+
+You can also use the `service_mode` to only run either the sender or device side of the code.
+
+This is useful if you want to run either the sender or device on different machines to test network.
+
+Running the Sender on my Mac and the Device on a RaspberryPi made no different. The Mac still error when
+trying to send the UDP packets.
 
 ## Networking setup
 My system is a 2017 15" Macbook Pro running *Big Sur (11.5)* and I primarily use Wireless networking at home. 
