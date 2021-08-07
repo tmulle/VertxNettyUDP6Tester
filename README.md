@@ -18,6 +18,13 @@ run successfully like it does on the other systems.
 
 **Note**: I disabled the Netty logging in `logback.xml` you can turn it on by modifying the file and rebuilding the project. I wanted clean outputs for the bug report.
 
+**Note #2**: I've included a pure Java `java.net.*` version of the application as well to demonstrate that using standard Java networking works properly.
+
+It has the same parameters as the `Tester` class and you can run it like: 
+```
+java -Dnet.interface=eth0 -cp VertxNettyIP6UdpTester-1.0-SNAPSHOT-fat.jar com.mycompany.vertxnettyip6udptester.RegularJavaUDPTester 
+```
+
 ## Code Setup
 
 The code has some initial defaults that I setup, defaults are in `()'s`:
