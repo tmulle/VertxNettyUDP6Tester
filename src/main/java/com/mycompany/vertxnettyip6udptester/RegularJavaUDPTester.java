@@ -57,7 +57,7 @@ public class RegularJavaUDPTester {
     public static void main(String[] args) {
 
         // Setup the variables
-        MODE = IP_MODE.valueOf(System.getProperty("net.ip_mode", "IPv4"));
+        MODE = IP_MODE.valueOf(System.getProperty("net.ip_mode", "IPv6"));
         INTERFACE = System.getProperty("net.interface", "en0");
         LISTEN_PORT = Integer.parseInt(System.getProperty("net.listen_port", "35056"));
 
