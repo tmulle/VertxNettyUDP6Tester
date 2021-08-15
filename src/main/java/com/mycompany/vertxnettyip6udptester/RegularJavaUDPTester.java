@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -113,7 +114,7 @@ public class RegularJavaUDPTester {
 
         private final static Logger LOG = LoggerFactory.getLogger(Sender.class);
 
-        DatagramSocket uniSocket;
+        MulticastSocket uniSocket;
         InetAddress mcAddress;
 
         @Override
@@ -122,7 +123,7 @@ public class RegularJavaUDPTester {
             try {
 
                 // Create the socket and multicast group
-                uniSocket = new DatagramSocket(0);
+                uniSocket = new MulticastSocket(0);
                 mcAddress = InetAddress.getByName(MULTICAST_GROUP);
 
                 // Set up the unicast listener thread to listen on all interfaces
@@ -146,7 +147,13 @@ public class RegularJavaUDPTester {
         private void setupSenderLoop() throws Exception {
 
             // Create the sender socket
-            DatagramSocket sender = new DatagramSocket();
+            MulticastSocket sender = new MulticastSocket(0);
+            
+            // Set which interface we have specified on the command line
+            NetworkInterface byName = NetworkInterface.getByName(INTERFACE);
+            
+            LOG.info("Sending Multicast Packets on interface: {}", byName);
+            sender.setNetworkInterface(byName);
             
             // Create the runnable
             Runnable senderRunnable = () -> {
@@ -179,6 +186,11 @@ public class RegularJavaUDPTester {
 
             Runnable uniListener = () -> {
                 try {
+//                    NetworkInterface iface = NetworkInterface.getByName(INTERFACE);
+//                    uniSocket.setNetworkInterface(iface);
+                   //uniSocket.setLoopbackMode(false);
+                    
+                    
                     LOG.info("Listening for Unicast message on {} @ {}", MODE, uniSocket.getLocalSocketAddress());
                     while (!Thread.interrupted()) {
 

@@ -145,7 +145,11 @@ public class Tester {
             // Create the options 
             DatagramSocketOptions options = new DatagramSocketOptions()
                     .setReuseAddress(true)
-                    .setReusePort(true);
+                    .setReusePort(true)
+                    .setMulticastNetworkInterface(INTERFACE); 
+                    // The above line fixes the sending of Multicast UDP on MacOS
+                    // However, when trying to send regular UDP traffic it still fails
+            
 
             // Enable IPv6?
             if (MODE == IP_MODE.IPv6) {
