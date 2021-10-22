@@ -219,7 +219,7 @@ public class RegularJavaUDPTester {
      */
     static class Device implements Runnable {
 
-        private final static Logger LOG = LoggerFactory.getLogger(Tester.Device.class);
+        private final static Logger LOG = LoggerFactory.getLogger(Device.class);
 
         private InetAddress mcIPAddress;
         private MulticastSocket mcSocket;
