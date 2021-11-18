@@ -20,6 +20,7 @@ run successfully like it does on the other systems.
 
 **Note #2**: I've included a pure Java `java.net.*` version of the application as well to demonstrate that using standard Java networking works properly.
 
+
 It has the same parameters as the `Tester` class and you can run it like: 
 ```
 java -Dnet.interface=eth0 -cp VertxNettyIP6UdpTester-1.0-SNAPSHOT-fat.jar com.mycompany.vertxnettyip6udptester.RegularJavaUDPTester 
@@ -48,7 +49,7 @@ You can also use the `service_mode` to only run either the sender or device side
 
 This is useful if you want to run either the sender or device on different machines to test network.
 
-Running the Sender on my Mac and the Device on a RaspberryPi made no different. The Mac still error when
+Running the Sender on my Mac and the Device on a RaspberryPi made no difference. The Mac still error when
 trying to send the UDP packets.
 
 ## Networking setup
