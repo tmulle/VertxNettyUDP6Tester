@@ -77,7 +77,7 @@ public class RegularJavaUDPTester {
         }
 
         // Which service are we running? Default ALL
-        OP_MODE = Operation_Mode.valueOf(System.getProperty("service_mode", "Both"));
+        OP_MODE = Operation_Mode.valueOf(System.getProperty("net.service_mode", "Both"));
 
         LOG.info("*** Starting Variables ***");
         LOG.info("Operation Mode = {}", OP_MODE);
