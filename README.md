@@ -1,4 +1,8 @@
 # VertxNettyUDP6Tester
+
+**Update**: Thanks to the folks at Netty this issue seems to be resolved with the latest 4.1.74.Final release. And Vert.x folks just updated to 4.1.25 which includes the Netty fix and the code now works properly as expected.
+
+--------------------------------------------------------------------
 Test of UDP sending on MacOS to demonstrate possible issue on MacOS
 
 Tester class to show a possible issue with Netty/Vertx and sending IP6
