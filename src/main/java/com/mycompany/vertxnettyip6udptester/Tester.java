@@ -148,7 +148,9 @@ public class Tester {
                     .setReusePort(true)
                     .setMulticastNetworkInterface(INTERFACE); 
                     // The above line fixes the sending of Multicast UDP on MacOS
-                    // However, when trying to send regular UDP traffic it still fails
+                    // Without it sending UDP seems to fail with a "No Route to Host"
+                    // This is a JDK bug and not a Netty/Vertx issue on Mac
+                    // when trying to pick a default interface
             
 
             // Enable IPv6?
