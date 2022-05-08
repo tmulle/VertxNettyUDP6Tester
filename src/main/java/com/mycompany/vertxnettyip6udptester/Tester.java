@@ -229,7 +229,6 @@ public class Tester {
             // Create the options 
             DatagramSocketOptions options = new DatagramSocketOptions()
                     .setReuseAddress(true)
-                    .setLogActivity(true)
                     .setReusePort(true);
 
             // Enable IPv6?
