@@ -1,7 +1,9 @@
 package com.mycompany.vertxnettyip6udptester;
 
+import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -46,6 +48,7 @@ public class Tester {
     private static int LISTEN_PORT;
     private static IP_MODE MODE;
     private static Operation_Mode OP_MODE;
+    private static JsonObject config;
 
     // Which mode
     private static enum IP_MODE {
@@ -57,31 +60,57 @@ public class Tester {
     };
 
     /**
+     * Set the config
+     * 
+     * @param newConfig
+     * @return 
+     */
+    private static Future<Void> setConfig(JsonObject newConfig) {
+        config = newConfig;
+        return Future.succeededFuture();
+    }
+    
+    /**
      * Main
      *
      * @param args
      */
     public static void main(String[] args) {
 
+        Vertx vertx = Vertx.vertx();
+
+        // Create the config retriever
+        ConfigRetriever configRetriever = ConfigRetriever.create(vertx);
+
+        // Create deployment options
+        DeploymentOptions options = new DeploymentOptions();
+
+        // Load the config
+        configRetriever.getConfig()
+                .onFailure(error -> LOG.error("Failed to load config, shutting down", error))
+                .compose(jsonObject -> setConfig(jsonObject))
+                .onComplete(jsonObject -> options.setConfig(config));
+                
+
         // Setup the variables
-        MODE = IP_MODE.valueOf(System.getProperty("net.ip_mode", "IPv6"));
-        INTERFACE = System.getProperty("net.interface", "en0");
-        LISTEN_PORT = Integer.parseInt(System.getProperty("net.listen_port", "35056"));
+        MODE = IP_MODE.valueOf(config.getString("net.ip_mode", "IPv6"));
+        INTERFACE = config.getString("net.interface", "en0");
+        LISTEN_PORT = config.getInteger("net.listen_port", 35056);
 
         // Which mode?
         switch (MODE) {
-            case IPv4 ->  {
+            case IPv4 -> {
                 MULTICAST_GROUP = "224.0.0.224";
                 LISTEN_ALL_INTERFACE = "0.0.0.0";
             }
-            case IPv6 ->  {
+            case IPv6 -> {
                 MULTICAST_GROUP = "FF02::1";
                 LISTEN_ALL_INTERFACE = "::";
             }
         }
 
         // Which service are we running? Default ALL
-        OP_MODE = Operation_Mode.valueOf(System.getProperty("net.service_mode", "Both"));
+        OP_MODE = Operation_Mode.valueOf(config.getString("net.service_mode", "Both"));
 
         LOG.info("*** Starting Variables ***");
         LOG.info("Operation Mode = {}", OP_MODE);
@@ -92,8 +121,6 @@ public class Tester {
         LOG.info("Network Port = {}", LISTEN_PORT);
         LOG.info("**************************");
 
-        Vertx vertx = Vertx.vertx();
-
         switch (OP_MODE) {
             case Sender -> {
                 vertx.deployVerticle(new Sender()).
@@ -103,7 +130,7 @@ public class Tester {
                         });
             }
 
-            case Device ->  {
+            case Device -> {
                 vertx.deployVerticle(new Device())
                         .onFailure(error -> {
                             LOG.error("DEVICE => Failed to startup", error);
@@ -142,12 +169,11 @@ public class Tester {
             DatagramSocketOptions options = new DatagramSocketOptions()
                     .setReuseAddress(true)
                     .setReusePort(true)
-                    .setMulticastNetworkInterface(INTERFACE); 
-                    // The above line fixes the sending of Multicast UDP on MacOS
-                    // Without it sending UDP seems to fail with a "No Route to Host"
-                    // This is a JDK bug and not a Netty/Vertx issue on Mac
-                    // when trying to pick a default interface
-            
+                    .setMulticastNetworkInterface(INTERFACE);
+            // The above line fixes the sending of Multicast UDP on MacOS
+            // Without it sending UDP seems to fail with a "No Route to Host"
+            // This is a JDK bug and not a Netty/Vertx issue on Mac
+            // when trying to pick a default interface
 
             // Enable IPv6?
             if (MODE == IP_MODE.IPv6) {
