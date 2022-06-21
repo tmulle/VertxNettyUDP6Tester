@@ -99,13 +99,15 @@ public class Tester {
 
         // Which mode?
         switch (MODE) {
-            case IPv4 -> {
+            case IPv4: {
                 MULTICAST_GROUP = "224.0.0.224";
                 LISTEN_ALL_INTERFACE = "0.0.0.0";
+                break;
             }
-            case IPv6 -> {
+            case IPv6: {
                 MULTICAST_GROUP = "FF02::1";
                 LISTEN_ALL_INTERFACE = "::";
+                break;
             }
         }
 
@@ -122,22 +124,24 @@ public class Tester {
         LOG.info("**************************");
 
         switch (OP_MODE) {
-            case Sender -> {
+            case Sender: {
                 vertx.deployVerticle(new Sender()).
                         onFailure(error -> {
                             LOG.error("SENDER => Failed to startup", error);
                             System.exit(-1);
                         });
+                break;
             }
 
-            case Device -> {
+            case Device: {
                 vertx.deployVerticle(new Device())
                         .onFailure(error -> {
                             LOG.error("DEVICE => Failed to startup", error);
                             System.exit(-1);
                         });
+                break;
             }
-            default -> {
+            default: {
                 // Deploy the receive then the sender
                 Future<String> senderVerticle = vertx.deployVerticle(new Sender());
                 Future<String> deviceVerticle = vertx.deployVerticle(new Device());
