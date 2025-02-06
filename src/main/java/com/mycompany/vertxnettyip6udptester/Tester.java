@@ -13,25 +13,27 @@ import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
 
 import io.vertx.core.json.JsonObject;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Tester class to show a possible issue with Netty/Vertx and sending IP6 UDP
  * traffic on MacOS.
- *
+ * <p>
  * It appears that the scope-id is being stripped off during the send at least
  * that's what the Netty debug output looks like
- *
+ * <p>
  * This code was thrown together and is not optimal but it works on Linux and
  * Windows
- *
+ * <p>
  * I have code that works using standard Java NIO classes which makes me think
  * it might be a Netty issue
- *
- *
+ * <p>
+ * <p>
  * This code simulates a device discovery mechanism. The Device class will
  * listen to the MULTICAST_GROUP for a discovery message and then will read the
  * port it needs to send a UDP response back to.
@@ -49,27 +51,32 @@ public class Tester {
     private static IP_MODE MODE;
     private static Operation_Mode OP_MODE;
     private static JsonObject config;
+    private static Vertx vertx;
 
     // Which mode
     private static enum IP_MODE {
         IPv4, IPv6
-    };
+    }
+
+    ;
 
     private static enum Operation_Mode {
         Sender, Device, Both
-    };
+    }
+
+    ;
 
     /**
      * Set the config
-     * 
+     *
      * @param newConfig
-     * @return 
+     * @return
      */
     private static Future<Void> setConfig(JsonObject newConfig) {
         config = newConfig;
         return Future.succeededFuture();
     }
-    
+
     /**
      * Main
      *
@@ -77,21 +84,24 @@ public class Tester {
      */
     public static void main(String[] args) {
 
-        Vertx vertx = Vertx.vertx();
+        vertx = Vertx.vertx();
 
         // Create the config retriever
         ConfigRetriever configRetriever = ConfigRetriever.create(vertx);
 
-        // Create deployment options
-        DeploymentOptions options = new DeploymentOptions();
-
         // Load the config
         configRetriever.getConfig()
-                .onFailure(error -> LOG.error("Failed to load config, shutting down", error))
-                .compose(jsonObject -> setConfig(jsonObject))
-                .onComplete(jsonObject -> options.setConfig(config));
-                
+                .onFailure(error -> {
+                    LOG.error("Failed to load config, shutting down", error);
+                    System.exit(1);
+                })
+                .compose(Tester::setConfig)
+                .onComplete(result -> {
+                    beginWork();
+                });
+    }
 
+    private static void beginWork() {
         // Setup the variables
         MODE = IP_MODE.valueOf(config.getString("net.ip_mode", "IPv6"));
         INTERFACE = config.getString("net.interface", "en0");
@@ -154,8 +164,8 @@ public class Tester {
             }
 
         }
-
     }
+
 
     /**
      * This class will send repeatedly a simulated discovery request and the
@@ -169,7 +179,7 @@ public class Tester {
         @Override
         public void start(Promise<Void> startPromise) throws Exception {
 
-            // Create the options 
+            // Create the options
             DatagramSocketOptions options = new DatagramSocketOptions()
                     .setReuseAddress(true)
                     .setReusePort(true)
@@ -256,7 +266,7 @@ public class Tester {
         @Override
         public void start(Promise<Void> startPromise) throws Exception {
 
-            // Create the options 
+            // Create the options
             DatagramSocketOptions options = new DatagramSocketOptions()
                     .setReuseAddress(true)
                     .setReusePort(true);
@@ -311,7 +321,7 @@ public class Tester {
             Buffer buffer = response.toBuffer();
 
             // Read the port we are supposed to reply back to
-            // this port is the port that the 
+            // this port is the port that the
             JsonObject toJsonObject = packet.data().toJsonObject();
             int parseInt = toJsonObject.getInteger("responsePort");
 
